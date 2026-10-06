@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:valyuta_kursi/pages/shell.dart';
-import 'package:valyuta_kursi/services/storage.dart' show prefs;
 
+import 'controllers/app_controller.dart';
+import 'pages/home_page.dart';
 
 class ValyutaApp extends StatefulWidget {
   const ValyutaApp({super.key});
@@ -11,25 +11,48 @@ class ValyutaApp extends StatefulWidget {
 }
 
 class _ValyutaAppState extends State<ValyutaApp> {
-  bool _dark = prefs.getBool('dark') ?? false;
+  final _ctrl = AppController();
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl.init();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    return AppScope(controller: _ctrl, child: const _Themed());
+  }
+}
+
+class _Themed extends StatelessWidget {
+  const _Themed();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppScope.of(context);
+    final seed = kAccents[c.accent];
+
+    ThemeData theme(Brightness b) => ThemeData(
+      useMaterial3: true,
+      colorSchemeSeed: seed,
+      brightness: b,
+      appBarTheme: const AppBarTheme(centerTitle: false),
+    );
+
     return MaterialApp(
       title: 'Valyuta kursi',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.deepPurple,
-        brightness: _dark ? Brightness.dark : Brightness.light,
-      ),
-      home: Shell(
-        dark: _dark,
-        onToggleTheme: () {
-          setState(() => _dark = !_dark);
-          prefs.setBool('dark', _dark);
-        },
-      ),
+      theme: theme(Brightness.light),
+      darkTheme: theme(Brightness.dark),
+      themeMode: c.themeMode,
+      home: const HomePage(),
     );
   }
 }
