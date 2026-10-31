@@ -1,0 +1,16 @@
+# Android build
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab
+!releases/*.apk
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Kiro internal
+.lock

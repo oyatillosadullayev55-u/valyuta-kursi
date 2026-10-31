@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valyuta Kurslari — O'zbekiston</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue: #1a6fd4;
+      --blue-dark: #1255a8;
+      --blue-light: #e8f0fe;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --red: #dc2626;
+      --red-bg: #fee2e2;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f1f5f9;
+      --white: #ffffff;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --radius: 14px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: linear-gradient(135deg, #1a6fd4 0%, #0d47a1 100%);
+      color: white;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-box {
+      background: white;
+      color: var(--blue);
+      font-weight: 800;
+      font-size: 15px;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    .topbar-title h1 { font-size: 18px; font-weight: 700; line-height: 1.2; }
+    .topbar-title p  { font-size: 12px; opacity: 0.82; }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .topbar-time {
+      text-align: right;
+      font-size: 13px;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      position: sticky;
+      top: 64px;
+      z-index: 100;
+      overflow-x: auto;
+    }
+    .navbar::-webkit-scrollbar { display: none; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      white-space: nowrap;
+      transition: color 0.2s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+    .nav-item.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+      font-weight: 600;
+    }
+    .nav-item:hover { color: var(--blue); }
+    .nav-icon { font-size: 16px; }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    /* ── CONVERTER CARD ── */
+    .converter-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .conv-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+    .conv-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .conv-icon {
+      width: 46px;
+      height: 46px;
+      background: var(--blue-light);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .conv-header-left h2 { font-size: 17px; font-weight: 700; }
+    .conv-header-left p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-bg);
+      color: var(--green);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Converter fields */
+    .conv-fields {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    @media (max-width: 600px) {
+      .conv-fields {
+        grid-template-columns: 1fr auto 1fr;
+        grid-template-rows: auto auto;
+      }
+      .conv-result-field { grid-column: 1 / -1; }
+    }
+
+    .field-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .field-input-row {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: white;
+      transition: border-color 0.2s;
+    }
+    .field-input-row:focus-within { border-color: var(--blue); }
+    .field-input-row input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 11px 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      width: 0;
+      min-width: 0;
+      background: transparent;
+    }
+    .clear-btn {
+      padding: 0 10px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      background: none;
+      border: none;
+      line-height: 1;
+    }
+
+    .currency-select {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      background: white;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+    .currency-select:focus-within { border-color: var(--blue); }
+    .currency-select select {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+      padding-right: 18px;
+    }
+    .currency-select .chevron {
+      position: absolute;
+      right: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      pointer-events: none;
+    }
+    .flag-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      font-size: 20px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .swap-btn {
+      width: 40px;
+      height: 40px;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.3s;
+      flex-shrink: 0;
+      align-self: flex-end;
+      margin-bottom: 0;
+    }
+    .swap-btn:hover { background: var(--blue-dark); transform: rotate(180deg); }
+
+    .result-field {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--blue);
+      background: var(--blue-light);
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+    }
+
+    .conv-info-bar {
+      margin-top: 14px;
+      background: #f0f6ff;
+      border: 1px solid #c7d9f7;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .conv-info-bar span { color: var(--muted); }
+
+    /* ── FILTER TABS ── */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .filter-tabs::-webkit-scrollbar { display: none; }
+    .ftab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      background: white;
+      color: var(--muted);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      transition: all 0.2s;
+    }
+    .ftab.active {
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 2px 8px rgba(26,109,212,0.35);
+    }
+    .ftab-icon { font-size: 15px; }
+
+    /* ── RATES CARD ── */
+    .rates-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .rates-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .rates-card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rates-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--blue-light);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .rates-card-header h3 { font-size: 15px; font-weight: 700; }
+    .rates-card-header p  { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .all-link {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    /* Table */
+    .rates-table { width: 100%; border-collapse: collapse; }
+    .rates-table thead th {
+      padding: 10px 20px;
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+    }
+    .rates-table thead th:last-child { text-align: right; }
+    .rates-table tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .rates-table tbody tr:last-child { border-bottom: none; }
+    .rates-table tbody tr:hover { background: #f8fafc; }
+    .rates-table td { padding: 13px 20px; font-size: 14px; }
+
+    .currency-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .currency-cell .flag { font-size: 26px; flex-shrink: 0; }
+    .currency-cell .name { font-weight: 600; font-size: 14px; }
+    .currency-cell .code { font-size: 12px; color: var(--muted); }
+
+    .code-badge {
+      display: inline-block;
+      background: #f1f5f9;
+      color: var(--muted);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .nominal-badge {
+      display: inline-block;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .rate-buy  { font-size: 15px; font-weight: 700; }
+    .rate-sell { font-size: 15px; font-weight: 700; color: var(--blue); }
+
+    .change-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      float: right;
+    }
+    .change-badge.up   { background: var(--green-bg); color: var(--green); }
+    .change-badge.down { background: var(--red-bg); color: var(--red); }
+    .change-badge.flat { background: #f1f5f9; color: var(--muted); }
+
+    /* Error bar */
+    .error-bar {
+      display: none;
+      margin: 12px 20px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .error-bar.hidden { display: none !important; }
+    .error-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--red);
+      font-size: 13px;
+    }
+    .retry-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red);
+      color: white;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Loader */
+    .loader-row td {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    @media (max-width: 640px) {
+      .features { grid-template-columns: repeat(2, 1fr); }
+    }
+    .feature-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .feature-card .ficon {
+      width: 42px;
+      height: 42px;
+      background: var(--blue-light);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin: 0 auto 10px;
+    }
+    .feature-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .feature-card p  { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      margin-top: 32px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 8px;
+      background: white;
+    }
+    footer a { color: var(--blue); text-decoration: none; }
+    .footer-lang {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-lang span { cursor: pointer; }
+    .footer-lang span.active { color: var(--blue); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo-box">UZ</div>
+    <div class="topbar-title">
+      <h1>Valyuta Kurslari</h1>
+      <p>Markaziy Bank rasmiy kurslari</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-time" id="topbar-time">
+      <div id="clock">—</div>
+      <div id="topbar-date">—</div>
+    </div>
+    <div class="lang-btn">🇺🇿 UZ ▾</div>
+  </div>
+</header>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <button class="nav-item active" data-tab="asosiy"><span class="nav-icon">🏠</span> Asosiy</button>
+  <button class="nav-item" data-tab="kurslar"><span class="nav-icon">📊</span> Valyuta kurslari</button>
+  <button class="nav-item" data-tab="grafik"><span class="nav-icon">📈</span> Grafiklar</button>
+  <button class="nav-item" data-tab="yangilik"><span class="nav-icon">📰</span> Yangiliklar</button>
+  <button class="nav-item" data-tab="sozlama"><span class="nav-icon">⚙️</span> Sozlamalar</button>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- CONVERTER -->
+  <div class="converter-card">
+    <div class="conv-header">
+      <div class="conv-header-left">
+        <div class="conv-icon">💱</div>
+        <div>
+          <h2>VALYUTA KONVERTORI</h2>
+          <p>Istalgan valyutani boshqa valyutaga aylantiring</p>
+        </div>
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Markaziy bank kurslari<br><small style="font-weight:400">Real vaqt rejimida</small>
+      </div>
+    </div>
+
+    <div class="conv-fields">
+      <!-- Miqdor -->
+      <div class="field-wrap">
+        <div class="field-label">Miqdor</div>
+        <div class="field-input-row">
+          <input type="number" id="conv-amount" value="100" min="0" />
+          <button class="clear-btn" onclick="document.getElementById('conv-amount').value='';calcConvert()">✕</button>
+        </div>
+      </div>
+
+      <!-- From -->
+      <div class="field-wrap">
+        <div class="field-label">Asosiy valyuta</div>
+        <div class="currency-select">
+          <span id="from-flag" class="flag-circle">🇺🇸</span>
+          <select id="conv-from"></select>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+
+      <!-- Swap -->
+      <button class="swap-btn" id="swap-btn" title="Almashtirish">⇄</button>
+
+      <!-- To -->
+      <div class="field-wrap">
+        <div class="field-label">Qaytish valyuta</div>
+        <div class="currency-select">
+          <span id="to-flag" class="flag-circle">🇺🇿</span>
+          <select id="conv-to"></select>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="field-wrap conv-result-field">
+        <div class="field-label">Natija</div>
+        <div class="result-field" id="conv-result-val">—</div>
+      </div>
+    </div>
+
+    <div class="conv-info-bar" id="conv-info-bar">
+      ℹ️ <strong id="conv-info-text">Ma'lumot yuklanmoqda...</strong>
+      <span id="conv-info-date"></span>
+    </div>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="filter-tabs">
+    <button class="ftab active" data-filter="all"><span class="ftab-icon">⊞</span> Barchasi</button>
+    <button class="ftab" data-filter="popular"><span class="ftab-icon">🇺🇸</span> AQSh dollari</button>
+    <button class="ftab" data-filter="eur"><span class="ftab-icon">🇪🇺</span> Yevro</button>
+    <button class="ftab" data-filter="uzs-highlight"><span class="ftab-icon">🇺🇿</span> O'zbekiston so'mi</button>
+    <button class="ftab" data-filter="gbp"><span class="ftab-icon">🇬🇧</span> Funt sterling</button>
+    <button class="ftab" data-filter="rub"><span class="ftab-icon">🇷🇺</span> Rossiya rubli</button>
+  </div>
+
+  <!-- RATES CARD -->
+  <div class="rates-card">
+    <div class="rates-card-header">
+      <div class="rates-card-header-left">
+        <div class="rates-icon">💹</div>
+        <div>
+          <h3>Valyuta kurslari</h3>
+          <p>Markaziy bankning bugungi rasmiy kurslari</p>
+        </div>
+      </div>
+      <button class="all-link" onclick="showAll()">Barcha kurslar ›</button>
+    </div>
+
+    <!-- Error bar -->
+    <div class="error-bar hidden" id="error-bar">
+      <div class="error-bar-left">
+        <span>⚠️</span>
+        <div>
+          <strong>Ma'lumot yuklanmadi: <span id="error-text">Failed to fetch</span></strong><br>
+          <small>CBU API ga ulanishda muammo. Internet aloqasini tekshiring.</small>
+        </div>
+      </div>
+      <button class="retry-btn" onclick="fetchRates()">🔄 Qayta urinish</button>
+    </div>
+
+    <table class="rates-table">
+      <thead>
+        <tr>
+          <th>Valyuta</th>
+          <th>Belgisi</th>
+          <th>Sotib olish</th>
+          <th>Sotish</th>
+          <th style="text-align:right">O'zgarish</th>
+        </tr>
+      </thead>
+      <tbody id="rates-tbody">
+        <tr class="loader-row">
+          <td colspan="5">
+            <div class="spinner"></div>
+            Kurslar yuklanmoqda...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features">
+    <div class="feature-card">
+      <div class="ficon">🛡️</div>
+      <h4>Ishonchli ma'lumot</h4>
+      <p>Markaziy bank rasmiy kurslari asosida</p>
+    </div>
+    <div class="feature-card">
+      <div class="ficon">⏱️</div>
+      <h4>Real vaqt</h4>
+      <p>Kurslar doimiy yangilanadi</p>
+    </div>
+    <div class="feature-card">
+      <div class="ficon">⚡</div>
+      <h4>Tez va qulay</h4>
+      <p>Oson konvertatsiya va aniq natija</p>
+    </div>
+    <div class="feature-card">
+      <div class="ficon">📱</div>
+      <h4>Har qanday qurilmada</h4>
+      <p>Kompyuter, planshet, telefon uchun</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Valyuta Kurslari. Barcha huquqlar himoyalangan.</span>
+  <div class="footer-lang">
+    🌐 O'zbekiston &nbsp;|&nbsp;
+    <span class="active">O'zbekcha</span>
+    <span>▾</span>
+  </div>
+</footer>
+
+<script>
+const API = 'https://cbu.uz/uz/arkhiv-kursov-valyut/json/';
+
+const FLAGS = {
+  USD:'🇺🇸',EUR:'🇪🇺',RUB:'🇷🇺',GBP:'🇬🇧',JPY:'🇯🇵',CNY:'🇨🇳',
+  KZT:'🇰🇿',KGS:'🇰🇬',TJS:'🇹🇯',AZN:'🇦🇿',TRY:'🇹🇷',UAH:'🇺🇦',
+  CHF:'🇨🇭',SEK:'🇸🇪',NOK:'🇳🇴',DKK:'🇩🇰',CAD:'🇨🇦',AUD:'🇦🇺',
+  KWD:'🇰🇼',SAR:'🇸🇦',AED:'🇦🇪',INR:'🇮🇳',BRL:'🇧🇷',GEL:'🇬🇪',
+  AMD:'🇦🇲',SGD:'🇸🇬',HKD:'🇭🇰',TMT:'🇹🇲',MXN:'🇲🇽',PLN:'🇵🇱',
+  CZK:'🇨🇿',HUF:'🇭🇺',RON:'🇷🇴',BGN:'🇧🇬',MDL:'🇲🇩',BYR:'🇧🇾',
+  UZS:'🇺🇿'
+};
+const POPULAR = ['USD','EUR','RUB','GBP','JPY','CNY','KZT','AZN','TRY','AED','CHF','AUD','KGS','TJS'];
+
+let allRates = [];
+let showLimit = 8;
+let currentFilter = 'all';
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('uz-UZ', {hour:'2-digit',minute:'2-digit'});
+  const d = now.toLocaleDateString('uz-UZ', {day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('clock').textContent = '🕐 Bugun, ' + t;
+  document.getElementById('topbar-date').textContent = d;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Format
+function fmt(n, dec=2) {
+  return Number(n).toLocaleString('uz-UZ', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+function getFlag(c) { return FLAGS[c] || '🏳️'; }
+
+// Get rate in UZS
+function getRateUZS(code) {
+  if (code === 'UZS') return 1;
+  const r = allRates.find(x => x.Ccy === code);
+  return r ? parseFloat(r.Rate) / (parseInt(r.Nominal)||1) : null;
+}
+
+// Converter
+function calcConvert() {
+  const amt   = parseFloat(document.getElementById('conv-amount').value) || 0;
+  const from  = document.getElementById('conv-from').value;
+  const to    = document.getElementById('conv-to').value;
+  const fr    = getRateUZS(from);
+  const tr    = getRateUZS(to);
+  const resEl = document.getElementById('conv-result-val');
+  const infoEl= document.getElementById('conv-info-text');
+  const dateEl= document.getElementById('conv-info-date');
+
+  // Update flags
+  document.getElementById('from-flag').textContent = getFlag(from);
+  document.getElementById('to-flag').textContent   = getFlag(to);
+
+  if (!fr || !tr || allRates.length === 0) {
+    resEl.textContent = '—';
+    return;
+  }
+  const result = (amt * fr) / tr;
+  resEl.textContent = fmt(result);
+
+  // Info bar
+  const oneResult = (1 * fr) / tr;
+  infoEl.innerHTML = `<strong>1 ${from} = ${fmt(oneResult)} ${to}</strong>`;
+  if (allRates.length > 0) {
+    const d = allRates[0].Date || '';
+    dateEl.textContent = d ? `(Markaziy bank kursi, ${d})` : '';
+  }
+}
+
+// Populate selects
+function populateSelects() {
+  const fromSel = document.getElementById('conv-from');
+  const toSel   = document.getElementById('conv-to');
+  const uzsOpt  = `<option value="UZS">${getFlag('UZS')} UZS</option>`;
+  const opts    = allRates.map(r =>
+    `<option value="${r.Ccy}">${getFlag(r.Ccy)} ${r.Ccy}</option>`
+  ).join('');
+  fromSel.innerHTML = opts + uzsOpt;
+  toSel.innerHTML   = uzsOpt + opts;
+  fromSel.value = 'USD';
+  toSel.value   = 'UZS';
+  calcConvert();
+}
+
+// Render table
+function renderTable() {
+  const tbody = document.getElementById('rates-tbody');
+  let data = allRates;
+
+  if (currentFilter === 'popular') data = allRates.filter(r => r.Ccy === 'USD');
+  else if (currentFilter === 'eur') data = allRates.filter(r => r.Ccy === 'EUR');
+  else if (currentFilter === 'gbp') data = allRates.filter(r => r.Ccy === 'GBP');
+  else if (currentFilter === 'rub') data = allRates.filter(r => r.Ccy === 'RUB');
+  else if (currentFilter === 'uzs-highlight') {
+    // Show top popular
+    data = allRates.filter(r => POPULAR.includes(r.Ccy));
+  }
+
+  const visible = (currentFilter === 'all') ? data.slice(0, showLimit) : data;
+
+  if (!visible.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">Ma'lumot yo'q</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = visible.map(r => {
+    const rate = parseFloat(r.Rate);
+    const diff = parseFloat(r.Diff) || 0;
+    // Buy is slightly less than official rate
+    const buy  = rate * 0.999;
+    const sell = rate;
+
+    let changeCls = 'flat', changeSymbol = '—', changeText = '0.00%';
+    if (diff > 0) {
+      changeCls = 'up'; changeSymbol = '↑'; changeText = '+' + fmt(Math.abs(diff/rate*100),2) + '%';
+    } else if (diff < 0) {
+      changeCls = 'down'; changeSymbol = '↓'; changeText = '-' + fmt(Math.abs(diff/rate*100),2) + '%';
+    }
+
+    return `
+      <tr onclick="quickConvert('${r.Ccy}')">
+        <td>
+          <div class="currency-cell">
+            <span class="flag">${getFlag(r.Ccy)}</span>
+            <div>
+              <div class="name">${r.CcyNm_UZ}</div>
+              <div class="code">${r.CcyNm_EN || ''}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="code-badge">${r.Ccy}</span>
+          ${parseInt(r.Nominal)>1 ? `<span class="nominal-badge">${r.Nominal}</span>` : ''}
+        </td>
+        <td><span class="rate-buy">${fmt(buy)}</span></td>
+        <td><span class="rate-sell">${fmt(sell)}</span></td>
+        <td>
+          <span class="change-badge ${changeCls}">${changeSymbol} ${changeText}</span>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function showAll() {
+  showLimit = 9999;
+  currentFilter = 'all';
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  document.querySelector('.ftab[data-filter="all"]').classList.add('active');
+  renderTable();
+}
+
+function quickConvert(code) {
+  document.getElementById('conv-from').value = code;
+  document.getElementById('conv-to').value   = 'UZS';
+  document.getElementById('conv-amount').value = 100;
+  calcConvert();
+  document.querySelector('.converter-card').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Fetch
+async function fetchRates() {
+  document.getElementById('rates-tbody').innerHTML =
+    `<tr class="loader-row"><td colspan="5"><div class="spinner"></div>Kurslar yuklanmoqda...</td></tr>`;
+  document.getElementById('error-bar').classList.add('hidden');
+
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    allRates = data.sort((a,b) => {
+      const ia = POPULAR.indexOf(a.Ccy), ib = POPULAR.indexOf(b.Ccy);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.Ccy.localeCompare(b.Ccy);
+    });
+
+    renderTable();
+    populateSelects();
+  } catch(e) {
+    document.getElementById('rates-tbody').innerHTML = `<tr><td colspan="5"></td></tr>`;
+    const bar = document.getElementById('error-bar');
+    bar.classList.remove('hidden');
+    document.getElementById('error-text').textContent = e.message;
+  }
+}
+
+// Filter tabs
+document.querySelectorAll('.ftab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    showLimit = 8;
+    renderTable();
+  });
+});
+
+// Nav tabs (placeholder)
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// Converter events
+document.getElementById('conv-amount').addEventListener('input', calcConvert);
+document.getElementById('conv-from').addEventListener('change', () => {
+  document.getElementById('from-flag').textContent = getFlag(document.getElementById('conv-from').value);
+  calcConvert();
+});
+document.getElementById('conv-to').addEventListener('change', () => {
+  document.getElementById('to-flag').textContent = getFlag(document.getElementById('conv-to').value);
+  calcConvert();
+});
+document.getElementById('swap-btn').addEventListener('click', () => {
+  const f = document.getElementById('conv-from');
+  const t = document.getElementById('conv-to');
+  [f.value, t.value] = [t.value, f.value];
+  document.getElementById('from-flag').textContent = getFlag(f.value);
+  document.getElementById('to-flag').textContent   = getFlag(t.value);
+  calcConvert();
+});
+
+// Init
+fetchRates();
+setInterval(fetchRates, 5 * 60 * 1000);
+</script>
+</body>
+</html>

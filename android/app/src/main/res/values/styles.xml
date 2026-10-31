@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App asosiy temasi — sarlavha paneli yo'q (WebView to'liq ekranda) -->
+    <style name="AppTheme" parent="android:Theme.Material.NoTitleBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:statusBarColor">#0d47a1</item>
+    </style>
+</resources>
